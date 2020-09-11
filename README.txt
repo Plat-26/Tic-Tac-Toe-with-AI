@@ -1,0 +1,2 @@
+
+This is a Tic-Tac-Toe game application (on the terminal) that allow three levels of difficulty -easy, medium and hard. This game is implemented uses various algorithms inclusing the recursion and the Mini-max algorithm as well as java-lang inbuilt methods.
