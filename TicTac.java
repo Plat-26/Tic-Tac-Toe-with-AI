@@ -7,17 +7,22 @@ public class Main {
     }
 }
 
+
 class playTicTac {
     static char[][] arry = new char[4][4];
-    static GameState gs;
+    static GameState gs = GameState.NOT_FINISHED;
     static char win;
     static char player;
+    boolean players = true;
+    static String player1;
+    static String player2;
     static boolean ischecked = false;
     static boolean inRow = false;
     static boolean inColomn = false;
     static boolean inDiagonal = false;
     static boolean notFinished = true;
-    static GameState playing = GameState.USER;
+    static String playing;
+    //static GameState playing = GameState.USER;
 
     void computerGuess() {
         Random random = new Random(4);
@@ -26,28 +31,69 @@ class playTicTac {
         checkCoords(cord1 + " " + cord2);
     }
 
-    void play() {
-        field();
-        while (notFinished) {
-            switch (playing) {
-                case USER:
-                    player = 'X';
-                    userPlay();
-                    playing = GameState.MACHINE;
-                    break;
-                case MACHINE:
-                    System.out.println("Making move level \"easy\"");
-                    player = 'O';
-                    machinePlay();
-                    playing = GameState.USER;
-                    break;
-                default:
-                    userPlay();
-            }
-        } System.out.println(gs.state);
+    void quit(){
+        System.out.println();
     }
 
-    void machinePlay() {
+    void setPlayer() {
+
+        if (players) {
+            playing = player1;
+            player = 'X';
+        } else {
+            playing = player2;
+            player = 'O';
+        }
+        players = !players;
+    }
+
+    void getCommand() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Input command: ");
+
+        try {
+            String command1 = scanner.next();
+            if (command1.equals("start")) {
+                player1 = scanner.next();
+                player2 = scanner.next();
+                gameLoop();
+            } else if(command1.equals("exit")) {
+                quit();
+            }
+        } catch (Exception e) {
+            System.out.println("Bad parameters!");
+            getCommand();
+        }
+    }
+
+    void gameLoop() {
+        field();
+        setPlayer();
+        if (gs == GameState.NOT_FINISHED) {
+            switch (playing) {
+                case "user":
+                    userPlay();
+                    setPlayer();
+                    System.out.println(playing);
+                    break;
+                case "easy":
+                    System.out.println("Making move level \"easy\"");
+                    levelEasy();
+                    setPlayer();
+                    break;
+                default:
+                    getCommand();
+            }
+        }
+        System.out.println(gs.state);
+        getCommand();
+    }
+
+    void play() {
+        getCommand();
+    }
+
+    void levelEasy() {
         computerGuess();
         if(!ischecked) computerGuess();
         else printField();
@@ -74,7 +120,7 @@ class playTicTac {
             Arrays.fill(row, ' ');
         }
     }
-    
+
     void printField() {
         System.out.println("---------");
         System.out.printf("| %c %c %c |\n", arry[1][3], arry[2][3], arry[3][3]);
@@ -189,9 +235,9 @@ enum GameState {
     NOT_FINISHED("Game not finished"),
     DRAW("Draw"),
     X_WINS("X wins"),
-    O_WINS("O wins"),
-    USER("Newbie"),
-    MACHINE("Easy");
+    O_WINS("O wins");
+    //USER("Newbie"),
+    //MACHINE("Easy");
 
     String state;
 
