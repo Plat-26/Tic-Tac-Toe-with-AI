@@ -22,19 +22,18 @@ class playTicTac {
     static boolean inDiagonal = false;
     static boolean notFinished = true;
     static String playing;
-    //static GameState playing = GameState.USER;
+    
 
-    void computerGuess() {
-        Random random = new Random(4);
-        int cord1 = random.nextInt(3 ) + 1;
-        int cord2 = random.nextInt(3) + 1;
-        checkCoords(cord1 + " " + cord2);
+    void field() {
+        for (char[] row : arry) {
+            Arrays.fill(row, ' ');
+        }
     }
-
+    
     void quit(){
         System.out.println();
     }
-
+    
     void setPlayer() {
 
         if (players) {
@@ -78,10 +77,16 @@ class playTicTac {
                     break;
                 case "easy":
                     System.out.println("Making move level \"easy\"");
-                    levelEasy();
+                    easyAI();
+                    setPlayer();
+                    break;
+                case "medium":
+                    System.out.println("Making move level \"medium\"");
+                    mediumAI();
                     setPlayer();
                     break;
                 default:
+                    System.out.println("Bad parameters!");
                     getCommand();
             }
         }
@@ -93,11 +98,68 @@ class playTicTac {
         getCommand();
     }
 
-    void levelEasy() {
+    void easyAI() {
         computerGuess();
         if(!ischecked) computerGuess();
         else printField();
         analyzeField(arry);
+    }
+
+    void computerGuess() {
+        Random random = new Random(4);
+        int cord1 = random.nextInt(3 ) + 1;
+        int cord2 = random.nextInt(3) + 1;
+        checkCoords(cord1 + " " + cord2);
+    }
+
+    void mediumAI() {
+        //check if AI can win
+        for(int j = 3; j > 0; j-- ) { //loop through the field
+            for(int i = 1; i < 4; i++) {
+                if (arry[i][j] == ' ') { //check if spot is empty
+                    arry[i][j] = player; //set empty spot to ai's player(X OR O)
+                    analyzeField(arry); //analyze the field with this instance
+                    arry[i][j] = ' ';  //return the filed to its initial state
+                    if (gs == GameState.X_WINS && player == 'X') { //if player x wins and the ai is X, return that coordinates, this is a bestCordinate
+                        checkCoords(i + " " + j); //send coordinates to be checked
+                        return; //break out of loop
+                        //return [i][j] as a string, this is bestCordinate
+                    } else if (gs == GameState.O_WINS && player == 'O') { //if player o wins and ai is O, return coordinates
+                        checkCoords(i + " " + j); //send coordinates to be checked
+                        return; //break out of loop
+                        //return [i][j] as a string, this is bestCordinate
+                    }
+                }
+            }
+        }
+
+        //check if nextPlayer can win
+        char nextPlayer = (player == 'X') ? 'O' : 'X'; //define the opponet's player
+        for(int j = 3; j > 0; j--) {//loop through the field
+            for (int i = 1; i < 4; i++) {
+                if (arry[i][j] == ' ') { //if there's an empty spot
+                    arry[i][j] = nextPlayer; //set ai's spot as opponent's player (X or O)
+                    analyzeField(arry); //check for a possible field
+                    arry[i][j] = ' '; //return field to its initial state
+                    if (gs == GameState.X_WINS && nextPlayer == 'X') {
+                        checkCoords(i + " " + j); //send coordinates to be checked
+                        printField();
+                        return; //break out of loop
+                        //return [i][j] as a string
+                    } else if (gs == GameState.O_WINS && nextPlayer == 'O') {
+                        checkCoords(i + " " + j); //send coordinates to be checked
+                        printField();
+                        return; //break out of loop
+                        //return [i][j] as a string
+                    }
+                }
+            }
+        }
+
+        //if all the above does not work
+        //return something from computerGuess
+        computerGuess();
+        printField();
     }
 
     void userPlay() {
@@ -114,13 +176,7 @@ class playTicTac {
         } while (!ischecked);
         analyzeField(arry);
     }
-
-    void field() {
-        for (char[] row : arry) {
-            Arrays.fill(row, ' ');
-        }
-    }
-
+    
     void printField() {
         System.out.println("---------");
         System.out.printf("| %c %c %c |\n", arry[1][3], arry[2][3], arry[3][3]);
@@ -170,7 +226,7 @@ class playTicTac {
         }
     }
 
-     void checkColomns(char[][] arry) {
+    void checkColomns(char[][] arry) {
         for (int i = 1; i < 4; i++) {
             int j = 3;
             if ((arry[i][j] == arry[i][j - 1]) && (arry[i][j - 1] == arry[i][j - 2])) {
@@ -182,7 +238,7 @@ class playTicTac {
         }
     }
 
-     void checkDiagonals(char[][] arry) {
+    void checkDiagonals(char[][] arry) {
         for (int i = 1, j = 3; i < 2 && j > 2; i++, j--) { //forward diagonal\
             if (arry[i][j] == arry[i + 1][j - 1] && arry[i + 1][j - 1] == arry[i + 2][j - 2]) {
                 inDiagonal = true;
@@ -195,9 +251,9 @@ class playTicTac {
 
             }
         }
-     }
+    }
 
-     void analyzeField(char[][] arry) {
+    void analyzeField(char[][] arry) {
         this.checkColomns(arry);
         this.checkDiagonals(arry);
         this.checkRows(arry);
