@@ -22,18 +22,18 @@ class playTicTac {
     static boolean inDiagonal = false;
     static boolean notFinished = true;
     static String playing;
-    
+
 
     void field() {
         for (char[] row : arry) {
             Arrays.fill(row, ' ');
         }
     }
-    
+
     void quit(){
         System.out.println();
     }
-    
+
     void setPlayer() {
 
         if (players) {
@@ -85,6 +85,11 @@ class playTicTac {
                     mediumAI();
                     setPlayer();
                     break;
+                case "hard":
+                    System.out.println("Making move level \"hard\"");
+                    hardAI();
+                    setPlayer();
+                    break;
                 default:
                     System.out.println("Bad parameters!");
                     getCommand();
@@ -92,6 +97,15 @@ class playTicTac {
         }
         System.out.println(gs.state);
         getCommand();
+    }
+
+    void hardAI() {
+        miniMax();
+        printField();
+    }
+
+    void miniMax() {
+        
     }
 
     void play() {
@@ -122,10 +136,12 @@ class playTicTac {
                     arry[i][j] = ' ';  //return the filed to its initial state
                     if (gs == GameState.X_WINS && player == 'X') { //if player x wins and the ai is X, return that coordinates, this is a bestCordinate
                         checkCoords(i + " " + j); //send coordinates to be checked
+                        printField();
                         return; //break out of loop
                         //return [i][j] as a string, this is bestCordinate
                     } else if (gs == GameState.O_WINS && player == 'O') { //if player o wins and ai is O, return coordinates
                         checkCoords(i + " " + j); //send coordinates to be checked
+                        printField();
                         return; //break out of loop
                         //return [i][j] as a string, this is bestCordinate
                     }
@@ -176,7 +192,7 @@ class playTicTac {
         } while (!ischecked);
         analyzeField(arry);
     }
-    
+
     void printField() {
         System.out.println("---------");
         System.out.printf("| %c %c %c |\n", arry[1][3], arry[2][3], arry[3][3]);
@@ -284,7 +300,6 @@ class playTicTac {
         }
     }
 }
-
 
 
 enum GameState {
